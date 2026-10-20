@@ -179,12 +179,12 @@ impl LinkProcessingOptions {
     }
 
     /// <https://html.spec.whatwg.org/multipage/#create-a-link-request>
-    pub(crate) fn create_link_request(self, webview_id: WebViewId) -> Option<RequestBuilder> {
+    pub(crate) fn create_link_request(self, webview_id: WebViewId, document: &Document) -> Option<RequestBuilder> {
         // Step 1. Assert: options's href is not the empty string.
         assert!(!self.href.is_empty());
 
         // Step 3. Let url be the result of encoding-parsing a URL given options's href, relative to options's base URL.
-        let Ok(url) = ServoUrl::parse_with_base(Some(&self.base_url), &self.href) else {
+        let Ok(url) = document.encoding_parse_a_url(&self.href) else {
             // Step 4. If url is failure, then return null.
             return None;
         };
@@ -292,7 +292,7 @@ impl LinkProcessingOptions {
             );
         }
         // Step 3. Let request be the result of creating a link request given options.
-        let Some(request) = self.create_link_request(webview_id) else {
+        let Some(request) = self.create_link_request(webview_id, document) else {
             // Step 4. If request is null, then return.
             return;
         };

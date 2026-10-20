@@ -587,7 +587,8 @@ impl HTMLLinkElement {
         let options = self.processing_options();
 
         // Step 2. Let request be the result of creating a link request given options.
-        let Some(request) = options.create_link_request(self.owner_window().webview_id()) else {
+        let document = self.upcast::<Node>().owner_doc();
+        let Some(request) = options.create_link_request(self.owner_window().webview_id(), &document) else {
             // Step 3. If request is null, then return.
             return None;
         };
@@ -661,7 +662,8 @@ impl HTMLLinkElement {
         options.destination = Destination::None;
 
         // Step 4. Let request be the result of creating a link request given options.
-        let Some(request) = options.create_link_request(self.owner_window().webview_id()) else {
+        let document = self.upcast::<Node>().owner_doc();
+        let Some(request) = options.create_link_request(self.owner_window().webview_id(), &document) else {
             // Step 5. If request is null, then return.
             return;
         };
@@ -673,7 +675,6 @@ impl HTMLLinkElement {
         // (Step 7, firing load/error events is handled in the FetchResponseListener impl for LinkFetchContext)
 
         // Step 8. The user agent should fetch request, with processResponseConsumeBody set to processPrefetchResponse.
-        let document = self.upcast::<Node>().owner_doc();
         let fetch_context = LinkFetchContext {
             url,
             link: Some(Trusted::new(self)),
